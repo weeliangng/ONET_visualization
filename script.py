@@ -77,7 +77,7 @@ def create_graph(G):
     app.layout = html.Div([
         cyto.Cytoscape(
             id='cytoscape-two-nodes',
-            layout={'name': 'breadthfirst'},
+            layout={'name': 'circle'},
             style={'width': '100%', 'height': '1400px'},
             elements= nodes + edges
         )
