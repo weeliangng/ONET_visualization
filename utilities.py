@@ -8,8 +8,7 @@ def get_occupation_onetsocCode_list():
     data = []
     for row in c.execute(onetsoc_occupation_sql):
         data.append({
-            "label": row[1],
-            "value": row[0]
+            row[0]: row[1]
         })
     conn.close()
     return data

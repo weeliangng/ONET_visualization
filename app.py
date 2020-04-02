@@ -2,8 +2,17 @@ import dash
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output, State
+import dash_cytoscape as cyto
 
 from utilities import get_occupation_onetsocCode_list
+
+def dropdown_occupations(exclude=[]):
+    options = []
+    for onet_occ in get_occupation_onetsocCode_list():
+        for onet,occ in onet_occ.items():
+            options.append({"label" : occ, "value": onet})
+    return options
+
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -15,7 +24,7 @@ app.layout = html.Div(children=[
         html.Div(children=[
                 html.Label("Add Occupation"),
                 dcc.Dropdown(id="occupation_dropdown",
-                    options=get_occupation_onetsocCode_list()),
+                    options=dropdown_occupations()),
                 html.Button(id="add_occupation_node", children ="Add")
         ]),
 
@@ -26,8 +35,18 @@ app.layout = html.Div(children=[
     ]),
 
     html.Div(className="eight columns",
-        children=[html.H1(children="Hello Dash")])
-
+        children=[
+            cyto.Cytoscape(
+                id='network_graph',
+                layout={'name': 'circle'},
+                style={'width': '100%', 'height': '1400px'},
+                elements=[
+            {'data': {'id': 'one', 'label': 'Node 1'}, 'position': {'x': 50, 'y': 50}},
+            {'data': {'id': 'two', 'label': 'Node 2'}, 'position': {'x': 60, 'y': 60}},
+            {'data': {'source': 'one', 'target': 'two','label': 'Node 1 to 2'}}
+        ]
+            )
+        ])
 ])
 
 @app.callback(
@@ -39,5 +58,11 @@ def update_occupation_list(add_occupation_node,occupation_dropdown):
     
     return occupation_dropdown
 
+
+
+def main():
+    pass
+
 if __name__ == "__main__":
+    main()
     app.run_server(debug=True)
