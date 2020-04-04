@@ -78,7 +78,7 @@ def create_network(data):
     for edge in data:
         G.add_node(edge["target"], label = occupation_data_dict[edge["target"]]["occupation"])
         G.add_node(edge["source"], label = occupation_data_dict[edge["source"]]["occupation"])
-        G.add_edge(edge["source"], edge["target"], related_index = edge["related_index"], id = edge["source"] + "->" +edge["target"])
+        G.add_edge(edge["source"], edge["target"], related_index = edge["related_index"], id = edge["source"] + "->" +edge["target"], label = edge["related_index"])
     return G
 
 def shorten_network(source_node, G, cutoff = 5):
@@ -93,7 +93,14 @@ def create_elements_from_graph(G):
     cytoscape_data_format = nx.cytoscape_data(G)
     nodes = cytoscape_data_format["elements"]["nodes"] 
     edges = cytoscape_data_format["elements"]["edges"]
-
     elements= nodes + edges
 
+    return elements
+
+def add_elements(onetsoc_code, related_no, cutoff):
+    career_changers_data = get_career_changers_matrix()
+    relevant_edges = get_relevant_edges(onetsoc_code, career_changers_data, related_no)
+    graph = create_network(relevant_edges)
+    graph = shorten_network(onetsoc_code, graph, cutoff)
+    elements =create_elements_from_graph(graph)
     return elements

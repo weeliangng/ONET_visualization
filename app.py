@@ -31,7 +31,8 @@ app.layout = html.Div(children=[
         html.Div(children=[
                 html.Label("Add Occupation"),
                 dcc.Dropdown(id="occupation_dropdown",
-                    options=dropdown_occupations()),
+                    options=dropdown_occupations(),
+                    value="11-1011.00"),
                 html.Button(id="add_occupation_node_button", children ="Add"),
                 html.Button(id="reset_graph_button", children ="Reset"),
         ]),
@@ -46,7 +47,10 @@ app.layout = html.Div(children=[
         children=[
             cyto.Cytoscape(
                 id='network_graph',
-                layout={'name': 'circle'},
+                layout={'name': 'cose',
+                    'componentSpacing': 100,
+                    'nodeRepulsion': 400000,
+                    'boxSelectionEnabled':True },
                 style={'width': '100%', 'height': '100vh'},
                 stylesheet= [
                     {'selector': 'node',
@@ -56,7 +60,8 @@ app.layout = html.Div(children=[
                     {'selector': 'edge',
                     'style': {
                         'curve-style':'bezier',
-                        'target-arrow-shape': 'vee'
+                        'target-arrow-shape': 'vee',
+                        'label': 'data(label)'
                     }}
 
                 ],
@@ -64,6 +69,10 @@ app.layout = html.Div(children=[
             
             
             )
+        ]),
+    html.Div(className="two columns",
+        children=[
+            html.H1(id="about_occupation", children = ["About Occupation"])
         ])
 ])
 
@@ -79,11 +88,7 @@ def add_occupation(add_occupation_node_button, onetsoc_code, existing_elements):
     if add_occupation_node_button is None:
         return dash.no_update, dash.no_update
     if add_occupation_node_button > 0:
-        career_changers_data = get_career_changers_matrix()
-        relevant_edges = get_relevant_edges(onetsoc_code, career_changers_data,5)
-        graph = create_network(relevant_edges)
-        graph = shorten_network(onetsoc_code, graph, cutoff = 1)
-        elements =create_elements_from_graph(graph)
+        elements = add_elements(onetsoc_code, related_no =3 , cutoff = 2)
         elements = [data for data in elements if data not in existing_elements]
         elements = elements + existing_elements
     return onetsoc_code, elements
@@ -94,6 +99,15 @@ def add_occupation(add_occupation_node_button, onetsoc_code, existing_elements):
 )
 def reset_graph(reset_graph_button):
     return 0
+
+@app.callback(
+    Output('about_occupation', 'children'),
+    [Input('network_graph', 'selectedNodeData')]
+)
+def get_selected_occupation_details(selected):
+    if not selected:
+        return
+    return selected[-1]['label']
 
 def update_occupation_list(add_occupation_node,occupation_dropdown):
     
