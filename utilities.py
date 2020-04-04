@@ -123,7 +123,7 @@ def get_colour():
     num_range = np.linspace(256, 1,10)
     index = 1
     for num in num_range:
-        colour = cm.YlGn(int(num))
+        colour = cm.Blues(int(num))
         rgb_colour = "rgb({},{},{})".format(int(colour[0]*255) , int(colour[1]*255) , int(colour[2]*255))
         colour_dict[index] = rgb_colour
         index +=1

@@ -18,12 +18,12 @@ external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
 app = dash.Dash(__name__, external_stylesheets = external_stylesheets)
 
-nodes = [{'data': {'id': 'one', 'label': 'Node 1'}, 'position': {'x': 0, 'y': 0}},
-         {'data': {'id': 'two', 'label': 'Node 2'}, 'position': {'x': 0, 'y': 0}}
-        ]
-edges = [{'data': {'source': 'one', 'target': 'two','label': 'Node 1 to 2'}},
-            {'data': {'source': 'two', 'target': 'one','label': 'Node 2 to 1'}}
-        ]
+#nodes = [{'data': {'id': 'one', 'label': 'Node 1'}, 'position': {'x': 0, 'y': 0}},
+#        {'data': {'id': 'two', 'label': 'Node 2'}, 'position': {'x': 0, 'y': 0}}
+#        ]
+#edges = [{'data': {'source': 'one', 'target': 'two','label': 'Node 1 to 2'}},
+#            {'data': {'source': 'two', 'target': 'one','label': 'Node 2 to 1'}}
+#        ]
 
 app.layout = html.Div(children=[
     html.Div(className="two columns",
@@ -81,15 +81,14 @@ app.layout = html.Div(children=[
         children=[
             cyto.Cytoscape(
                 id='network_graph',
-                layout={'name': 'cose',
-                    'componentSpacing': 100,
-                    'nodeRepulsion': 4000},
+                layout={'name': 'circle'},
                 style={'width': '100%', 'height': '100vh'},
                 boxSelectionEnabled = True,
                 stylesheet= [
                     {'selector': 'node',
                     'style': {
-                        'label': 'data(label)'
+                        'label': 'data(label)',
+                        'background-color': 'rgb(66, 117, 245)'
                     }},
                     {'selector': 'edge',
                     'style': {
