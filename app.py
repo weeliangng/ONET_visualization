@@ -83,9 +83,9 @@ app.layout = html.Div(children=[
                 id='network_graph',
                 layout={'name': 'cose',
                     'componentSpacing': 100,
-                    'nodeRepulsion': 400000,
-                    'boxSelectionEnabled':True },
+                    'nodeRepulsion': 4000},
                 style={'width': '100%', 'height': '100vh'},
+                boxSelectionEnabled = True,
                 stylesheet= [
                     {'selector': 'node',
                     'style': {
