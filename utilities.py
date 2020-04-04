@@ -57,19 +57,24 @@ def get_occupation_data():
     return occupation_data_dictionary
 #################################################################################
 
-def get_relevant_edges(id,  data, max_index = 10):
+def get_relevant_edges(id,  data, max_index = 10, direction = "out"):
     nodes = list()
     edges = list()
     nodes.append(id)
     for node in nodes: 
         #print(len(nodes))
-        edges_with_node = list(filter(lambda edge: edge["source"]==node and int(edge["related_index"])<=max_index, data))
+        if direction == "out":
+            edges_with_node = list(filter(lambda edge: edge["source"]==node and int(edge["related_index"])<=max_index, data))
+        elif direction == "in":
+            edges_with_node = list(filter(lambda edge: edge["target"]==node and int(edge["related_index"])<=max_index, data))
         edges += edges_with_node
         for edge in edges_with_node:
-            if edge["target"] not in nodes:
-                nodes.append(edge["target"])
-        
-
+            if direction == "out":
+                if edge["target"] not in nodes:
+                    nodes.append(edge["target"])
+            elif direction == "in":
+                if edge["source"] not in nodes:
+                    nodes.append(edge["source"])
     return edges
 
 def create_network(data):
@@ -81,8 +86,12 @@ def create_network(data):
         G.add_edge(edge["source"], edge["target"], related_index = edge["related_index"], id = edge["source"] + "->" +edge["target"], label = edge["related_index"])
     return G
 
-def shorten_network(source_node, G, cutoff = 5):
-    pl = nx.single_source_shortest_path_length(G, source = source_node, cutoff = cutoff)
+def shorten_network(source_node, G, cutoff = 5, direction = "out"):
+    if direction == "out":
+        pl = nx.single_source_shortest_path_length(G, source = source_node, cutoff = cutoff)
+    elif direction == "in":
+        pl = nx.shortest_path_length(G, target = source_node)
+        pl = { node: path_length for node, path_length in pl.items() if path_length <= cutoff}
     #p = nx.single_source_shortest_path(G, source = source_node, cutoff = cutoff)
     nodes_to_remove = set(G.nodes()).difference(set(pl.keys()))
     for node in nodes_to_remove:
@@ -97,10 +106,10 @@ def create_elements_from_graph(G):
 
     return elements
 
-def add_elements(onetsoc_code, related_no, cutoff):
+def add_elements(onetsoc_code, related_no, cutoff, direction = "out"):
     career_changers_data = get_career_changers_matrix()
-    relevant_edges = get_relevant_edges(onetsoc_code, career_changers_data, related_no)
+    relevant_edges = get_relevant_edges(onetsoc_code, career_changers_data, related_no, direction)
     graph = create_network(relevant_edges)
-    graph = shorten_network(onetsoc_code, graph, cutoff)
+    graph = shorten_network(onetsoc_code, graph, cutoff, direction)
     elements =create_elements_from_graph(graph)
     return elements
