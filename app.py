@@ -39,7 +39,7 @@ app.layout = html.Div(children=[
             cyto.Cytoscape(
                 id='network_graph',
                 layout={'name': 'circle'},
-                style={'width': '100%', 'height': '1400px'},
+                style={'width': '100%', 'height': '100vh'},
                 elements=[
             {'data': {'id': 'one', 'label': 'Node 1'}, 'position': {'x': 50, 'y': 50}},
             {'data': {'id': 'two', 'label': 'Node 2'}, 'position': {'x': 60, 'y': 60}},
