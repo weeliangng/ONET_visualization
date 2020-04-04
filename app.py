@@ -35,13 +35,13 @@ app.layout = html.Div(children=[
                     value="11-1011.00"),
                 html.Div(style = {'marginBottom': 25, 'marginTop': 25}, children=[
                     html.H5("Add outward occupation graph"),
-                    html.Label(children ="number of out neighbours"),
-                    dcc.Slider(
-                            id="n_out_neighbours_slider",
+                    html.Label(children ="Related index filter for outward occupations"),
+                    dcc.RangeSlider(
+                            id="out_related_index_filter_slider",
                             min=1,
                             max=10,
                             step=1,
-                            value=5,
+                            value=[1,5],
                             marks={i+1:str(i+1) for i in range(10)}
                     )
                 ])
@@ -61,13 +61,13 @@ app.layout = html.Div(children=[
                 html.Button(id="add_out_occupation_node_button", children ="Add"),
                 html.Div(style={'marginBottom': 25, 'marginTop': 25}, children=[
                     html.H5("Add inward occupations to selected occupation node"),
-                    html.Label(children ="Max related index"),
-                    dcc.Slider(
-                            id="filter_related_index_slider",
+                    html.Label(children ="Related index filter for inward occupations"),
+                    dcc.RangeSlider(
+                            id="in_related_index_filter_slider",
                             min=1,
                             max=10,
                             step=1,
-                            value=1,
+                            value=[1,5],
                             marks={i+1:str(i+1) for i in range(10)}
                     )
                 ]),
@@ -95,7 +95,8 @@ app.layout = html.Div(children=[
                     'style': {
                         'curve-style':'bezier',
                         'target-arrow-shape': 'vee',
-                        'label': 'data(label)'
+                        'line-color': 'data(colour)',
+                        'target-arrow-color': 'data(colour)'
                     }}
 
                 ],
@@ -115,23 +116,23 @@ app.layout = html.Div(children=[
     [Input(component_id='add_out_occupation_node_button', component_property='n_clicks'),
     Input(component_id='add_in_occupation_node_button', component_property='n_clicks')],
     [State(component_id='occupation_dropdown', component_property='value'),
-    State(component_id='n_out_neighbours_slider', component_property='value'),
+    State(component_id='out_related_index_filter_slider', component_property='value'),
     State(component_id='distance_slider', component_property='value'),
-    State(component_id='filter_related_index_slider', component_property='value'),
+    State(component_id='in_related_index_filter_slider', component_property='value'),
     State(component_id='network_graph', component_property='elements')]
 )
-def add_occupation(add_out_occupation_node_button, add_in_occupation_node_button, onetsoc_code, related_no, cutoff_distance, related_index_filter, existing_elements):
+def add_occupation(add_out_occupation_node_button, add_in_occupation_node_button, onetsoc_code, out_related_index_filter, cutoff_distance, in_related_index_filter, existing_elements):
     elements = []
     if add_out_occupation_node_button is None or add_in_occupation_node_button is None:
         return dash.no_update
     if add_out_occupation_node_button > 0:
-        elements = add_elements(onetsoc_code, related_no = related_no , cutoff = cutoff_distance)
+        elements = add_elements(onetsoc_code, related_index_filter = out_related_index_filter , cutoff = cutoff_distance)
         elements = [data for data in elements if data not in existing_elements]
         elements = elements + existing_elements
         add_out_occupation_node_button = 0
         add_in_occupation_node_button = 0
     if add_in_occupation_node_button > 0:
-        elements = add_elements(onetsoc_code, related_no = related_index_filter , cutoff = 1, direction ="in")
+        elements = add_elements(onetsoc_code, related_index_filter = in_related_index_filter , cutoff = 1, direction ="in")
         elements = [data for data in elements if data not in existing_elements]
         elements = elements + existing_elements
         add_out_occupation_node_button = 0
