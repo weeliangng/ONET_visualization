@@ -33,6 +33,30 @@ app.layout = html.Div(children=[
                 dcc.Dropdown(id="occupation_dropdown",
                     options=dropdown_occupations(),
                     value="11-1011.00"),
+                html.Div(style = {'marginBottom': 25, 'marginTop': 25}, children=[
+                    html.H5(children ="number of out neighbours"),
+                    dcc.Slider(
+                            id="n_out_neighbours",
+                            min=1,
+                            max=10,
+                            step=1,
+                            value=5,
+                            marks={i+1:str(i+1) for i in range(10)}
+                    )
+                ])
+                ,
+                html.Div(style={'marginBottom': 25, 'marginTop': 25}, children=[
+                html.H5(children ="Distance"),
+                    dcc.Slider(
+                            id="distance",
+                            min=1,
+                            max=5,
+                            step=1,
+                            value=1,
+                            marks={i+1:str(i+1) for i in range(5)}
+                    )
+                ])
+                ,
                 html.Button(id="add_occupation_node_button", children ="Add"),
                 html.Button(id="reset_graph_button", children ="Reset"),
         ]),
@@ -42,7 +66,8 @@ app.layout = html.Div(children=[
 
         ])
     ]),
-
+#############################################################
+###### GRAPH
     html.Div(className="eight columns",
         children=[
             cyto.Cytoscape(
@@ -66,8 +91,8 @@ app.layout = html.Div(children=[
 
                 ],
                 elements=[]
-            
-            
+#############################################################
+###### Occupation details            
             )
         ]),
     html.Div(className="two columns",
