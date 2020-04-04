@@ -34,7 +34,7 @@ app.layout = html.Div(children=[
                     options=dropdown_occupations(),
                     value="11-1011.00"),
                 html.Div(style = {'marginBottom': 25, 'marginTop': 25}, children=[
-                    html.H5(children ="number of out neighbours"),
+                    html.Label(children ="number of out neighbours"),
                     dcc.Slider(
                             id="n_out_neighbours",
                             min=1,
@@ -46,14 +46,14 @@ app.layout = html.Div(children=[
                 ])
                 ,
                 html.Div(style={'marginBottom': 25, 'marginTop': 25}, children=[
-                html.H5(children ="Distance"),
+                html.Label(children ="Distance"),
                     dcc.Slider(
                             id="distance",
                             min=1,
-                            max=5,
+                            max=10,
                             step=1,
                             value=1,
-                            marks={i+1:str(i+1) for i in range(5)}
+                            marks={i+1:str(i+1) for i in range(10)}
                     )
                 ])
                 ,
@@ -106,14 +106,16 @@ app.layout = html.Div(children=[
     Output(component_id='network_graph', component_property='elements')],
     [Input(component_id='add_occupation_node_button', component_property='n_clicks')],
     [State(component_id='occupation_dropdown', component_property='value'),
+    State(component_id='n_out_neighbours', component_property='value'),
+    State(component_id='distance', component_property='value'),
     State(component_id='network_graph', component_property='elements')]
 )
-def add_occupation(add_occupation_node_button, onetsoc_code, existing_elements):
+def add_occupation(add_occupation_node_button, onetsoc_code, related_no, cutoff_distance, existing_elements):
     elements = []
     if add_occupation_node_button is None:
         return dash.no_update, dash.no_update
     if add_occupation_node_button > 0:
-        elements = add_elements(onetsoc_code, related_no =3 , cutoff = 2)
+        elements = add_elements(onetsoc_code, related_no = related_no , cutoff = cutoff_distance)
         elements = [data for data in elements if data not in existing_elements]
         elements = elements + existing_elements
     return onetsoc_code, elements
