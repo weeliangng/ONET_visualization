@@ -92,8 +92,29 @@ app.layout = html.Div(children=[
                     
                 ]),
                 html.Button(id="add_in_occupation_node_button", children ="Add"),
-                html.Br(),
+                html.Hr(),
                 html.Button(id="reset_graph_button", children ="Reset"),
+                html.Div(children=[
+                    html.P(style = {"text-align": "center"},
+                        children=[
+                            html.A(href="https://services.onetcenter.org/", 
+                                title="This site incorporates information from O*NET Web Services. Click to learn more.",
+                                children=[html.Img(src="https://www.onetcenter.org/image/link/onet-in-it.svg", 
+                                        style={"width": "130px", "height": "60px", "border": "none"}, 
+                                        alt="O*NET in-it"
+                                            )
+                                            ]
+                                )
+                            ]
+                            ),
+                    html.P(children=[
+                        "This site incorporates information from ",
+                        html.A(href="https://services.onetcenter.org/", children = ["O*NET Web Services"]),
+                        " by the U.S. Department of Labor, Employment and Training Administration (USDOL/ETA). O*NET&reg; is a trademark of USDOL/ETA."
+                    ])
+                ]
+
+                )
         ])
     ]),
 #############################################################
@@ -117,8 +138,11 @@ app.layout = html.Div(children=[
                         'target-arrow-shape': 'vee',
                         'line-color': 'data(colour)',
                         'target-arrow-color': 'data(colour)'
+                    }},
+                    {'selector': ':selected',
+                    'style': {
+                        'background-color': 'rgb(166, 117, 245)'
                     }}
-
                 ],
                 elements=[]
 #############################################################
@@ -194,4 +218,4 @@ def main():
 
 if __name__ == "__main__":
     main()
-    app.run_server(debug=False)
+    app.run_server(debug=True)
