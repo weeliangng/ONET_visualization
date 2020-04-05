@@ -147,8 +147,6 @@ def add_occupation(add_out_occupation_node_button, add_in_occupation_node_button
     elements = []
     if add_out_occupation_node_button is None and add_in_occupation_node_button is None:
         return elements, {'name': 'circle'}
-    print(add_out_occupation_node_button)
-    print(add_in_occupation_node_button)
     if add_out_occupation_node_button is None: add_out_occupation_node_button = 0
     if add_in_occupation_node_button is None: add_in_occupation_node_button = 0
     if add_out_occupation_node_button > add_in_occupation_node_button:
@@ -196,4 +194,4 @@ def main():
 
 if __name__ == "__main__":
     main()
-    app.run_server(debug=True)
+    app.run_server(debug=False)
