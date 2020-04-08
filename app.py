@@ -4,7 +4,7 @@ import dash_html_components as html
 from dash.dependencies import Input, Output, State
 import dash_cytoscape as cyto
 
-from utilities import *
+from network_logic import *
 
 def dropdown_occupations(exclude=[]):
     options = []
