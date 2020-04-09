@@ -13,6 +13,11 @@ def dropdown_occupations(exclude=[]):
             options.append({"label" : occ, "value": onet})
     return options
 
+def default_sidebar():
+    children = [
+                html.H5(id="Instructions", children = ["Instructions"]),
+    ]
+    return children
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -150,9 +155,9 @@ app.layout = html.Div(children=[
             )
         ]),
     html.Div(className="two columns",
-        children=[
-            html.H5(id="about_occupation", children = ["About Occupation"])
-        ])
+        id = "side_bar",
+        children=default_sidebar()
+        )
 ])
 
 @app.callback(
@@ -197,25 +202,21 @@ def reset_graph(reset_graph_button):
         return add_out_occupation_node_n_clicks, add_in_occupation_node_n_clicks
 
 @app.callback(
-    [Output('about_occupation', 'children'),
+    [Output('side_bar', 'children'),
     Output('occupation_dropdown', 'value')],
     [Input('network_graph', 'selectedNodeData')],
     [State('occupation_dropdown', 'value')]
 )
 def get_selected_occupation_details(selected_node, dropdown):
     if not selected_node:
-        return "",dropdown
-    return selected_node[-1]['label'], selected_node[-1]['id']
-
-def update_occupation_list(add_occupation_node,occupation_dropdown):
-    
-    return occupation_dropdown
+        return default_sidebar(),dropdown
+    return html.H5(selected_node[-1]['label']), selected_node[-1]['id']
 
 
 
-def main():
-    pass
+
+
 
 if __name__ == "__main__":
-    main()
+    #main()
     app.run_server(debug=True)
