@@ -27,8 +27,46 @@ app = dash.Dash(__name__, external_stylesheets = external_stylesheets)
 #            {'data': {'source': 'two', 'target': 'one','label': 'Node 2 to 1'}}
 #        ]
 cyto.load_extra_layouts()
-
+######### Sidebar
 app.layout = html.Div(children=[
+    html.Div(className="three columns",
+        id = "side_bar", style={"height": "100vh", "overflow": "scroll"},
+        children=default_sidebar()
+        ),
+
+#############################################################
+###### GRAPH
+    html.Div(className="seven columns",
+        children=[
+            cyto.Cytoscape(
+                id='network_graph',
+                layout={'name': 'cola'},
+                style={'width': '100%', 'height': '100vh'},
+                boxSelectionEnabled = True,
+                stylesheet= [
+                    {'selector': 'node',
+                    'style': {
+                        'label': 'data(label)',
+                        'background-color': 'rgb(66, 117, 245)'
+                    }},
+                    {'selector': 'edge',
+                    'style': {
+                        'curve-style':'bezier',
+                        'target-arrow-shape': 'vee',
+                        'line-color': 'data(colour)',
+                        'target-arrow-color': 'data(colour)'
+                    }},
+                    {'selector': ':selected',
+                    'style': {
+                        'background-color': 'rgb(166, 117, 245)'
+                    }}
+                ],
+                elements=[]
+           
+            )
+        ]),
+#############################################################
+###### Controls
     html.Div(className="two columns", 
         children=[
         html.Div(children=[
@@ -118,42 +156,7 @@ app.layout = html.Div(children=[
                 )
         ])
     ]),
-#############################################################
-###### GRAPH
-    html.Div(className="seven columns",
-        children=[
-            cyto.Cytoscape(
-                id='network_graph',
-                layout={'name': 'cola'},
-                style={'width': '100%', 'height': '100vh'},
-                boxSelectionEnabled = True,
-                stylesheet= [
-                    {'selector': 'node',
-                    'style': {
-                        'label': 'data(label)',
-                        'background-color': 'rgb(66, 117, 245)'
-                    }},
-                    {'selector': 'edge',
-                    'style': {
-                        'curve-style':'bezier',
-                        'target-arrow-shape': 'vee',
-                        'line-color': 'data(colour)',
-                        'target-arrow-color': 'data(colour)'
-                    }},
-                    {'selector': ':selected',
-                    'style': {
-                        'background-color': 'rgb(166, 117, 245)'
-                    }}
-                ],
-                elements=[]
-#############################################################
-###### Occupation details            
-            )
-        ]),
-    html.Div(className="three columns",
-        id = "side_bar", style={"height": "100vh", "overflow": "scroll"},
-        children=default_sidebar()
-        )
+
 ])
 
 @app.callback(

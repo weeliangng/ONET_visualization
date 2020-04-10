@@ -1,6 +1,7 @@
 import sqlite3
 import dash_core_components as dcc
 import dash_html_components as html
+from network_logic import get_occupation_onetsocCode_dict
 
 def get_occupation_description(onetsoc_code):
     conn = sqlite3.connect('./data/ONET.sqlite')
@@ -88,7 +89,7 @@ def default_sidebar():
                                 **To add occupations pointing to a selected occupation:**
                                 * Select the occupation in the graph
                                 * Select the relatedness filter range
-                                  * Note that some occupations do not have any occupations within the selected relatedness range pointing towards it. In that case no occupation will be added.
+                                  * Note that not all occupations have occupations within the selected relatedness range pointing towards it. In that case no occupation will be added.
                                 * Click on "Add" Button
                                 """)
 
@@ -101,6 +102,7 @@ def occupation_details_tab(onetsoc_code):
     tabs = dcc.Tabs([
                     dcc.Tab(label = "About",
                             children = [
+                                html.H5(get_occupation_onetsocCode_dict()[onetsoc_code]),
                                 html.P(
                                     children = [get_occupation_description(onetsoc_code)]
                                 ),
@@ -118,12 +120,7 @@ def occupation_details_tab(onetsoc_code):
 
                             ]
                         ),
-                    dcc.Tab(label = "Openings",
-                            children = [
 
-
-                            ]
-                        ),
                     
     ])
     return tabs
