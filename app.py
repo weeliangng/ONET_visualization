@@ -14,11 +14,7 @@ def dropdown_occupations(exclude=[]):
             options.append({"label" : occ, "value": onet})
     return options
 
-def default_sidebar():
-    children = [
-                html.H5(id="Instructions", children = ["Instructions"]),
-    ]
-    return children
+
 
 external_stylesheets = []#'https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -33,7 +29,7 @@ app = dash.Dash(__name__, external_stylesheets = external_stylesheets)
 cyto.load_extra_layouts()
 
 app.layout = html.Div(children=[
-    html.Div(className="two columns",
+    html.Div(className="two columns", 
         children=[
         html.Div(children=[
                 html.Label("Layout"),
