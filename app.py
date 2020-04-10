@@ -5,6 +5,7 @@ from dash.dependencies import Input, Output, State
 import dash_cytoscape as cyto
 
 from network_logic import *
+from occupation_details import *
 
 def dropdown_occupations(exclude=[]):
     options = []
@@ -19,7 +20,7 @@ def default_sidebar():
     ]
     return children
 
-external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+external_stylesheets = []#'https://codepen.io/chriddyp/pen/bWLwgP.css']
 
 app = dash.Dash(__name__, external_stylesheets = external_stylesheets)
 
@@ -45,7 +46,6 @@ app.layout = html.Div(children=[
                         {'label': 'cose', 'value': 'cose'},
                         {'label': 'cose-bilkent', 'value': 'cose-bilkent'},
                         {'label': 'dagre', 'value': 'dagre'},
-                        {'label': 'euler', 'value': 'euler'},
                         {'label': 'grid', 'value': 'grid'},
                         {'label': 'klay', 'value': 'klay'},
                         {'label': 'spread', 'value': 'spread'}
@@ -59,7 +59,7 @@ app.layout = html.Div(children=[
                     clearable=False),
                 html.Div(style = {'marginBottom': 25, 'marginTop': 25}, children=[
                     html.H5("Add outward occupation graph"),
-                    html.Label(children ="Related index filter for outward occupations"),
+                    html.Label(children ="Relatedness ranking filter."),
                     dcc.RangeSlider(
                             id="out_related_index_filter_slider",
                             min=1,
@@ -85,7 +85,7 @@ app.layout = html.Div(children=[
                 html.Button(id="add_out_occupation_node_button", children ="Add"),
                 html.Div(style={'marginBottom': 25, 'marginTop': 25}, children=[
                     html.H5("Add inward occupations to selected occupation node"),
-                    html.Label(children ="Related index filter for inward occupations"),
+                    html.Label(children ="Relatedness ranking filter."),
                     dcc.RangeSlider(
                             id="in_related_index_filter_slider",
                             min=1,
@@ -124,7 +124,7 @@ app.layout = html.Div(children=[
     ]),
 #############################################################
 ###### GRAPH
-    html.Div(className="eight columns",
+    html.Div(className="seven columns",
         children=[
             cyto.Cytoscape(
                 id='network_graph',
@@ -154,8 +154,8 @@ app.layout = html.Div(children=[
 ###### Occupation details            
             )
         ]),
-    html.Div(className="two columns",
-        id = "side_bar",
+    html.Div(className="three columns",
+        id = "side_bar", style={"height": "100vh", "overflow": "scroll"},
         children=default_sidebar()
         )
 ])
@@ -210,7 +210,7 @@ def reset_graph(reset_graph_button):
 def get_selected_occupation_details(selected_node, dropdown):
     if not selected_node:
         return default_sidebar(),dropdown
-    return html.H5(selected_node[-1]['label']), selected_node[-1]['id']
+    return occupation_details_tab(selected_node[-1]['id']), selected_node[-1]['id']
 
 
 

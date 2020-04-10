@@ -1,4 +1,6 @@
 import sqlite3
+import dash_core_components as dcc
+import dash_html_components as html
 
 def get_occupation_description(onetsoc_code):
     conn = sqlite3.connect('./data/ONET.sqlite')
@@ -24,6 +26,9 @@ def get_occupation_tasks(onetsoc_code):
         occupation_tasks.append(row)
     return occupation_tasks
 
+def occupation_tasks_content(onetsoc_code):    
+    return html.Ul(children = [html.Li(task) for task in get_occupation_tasks(onetsoc_code)])
+
 def get_top5_work_activities(onetsoc_code):
     conn = sqlite3.connect('./data/ONET.sqlite')
     onetsoc_work_activities_sql = """select element_name, description from work_activities
@@ -38,3 +43,25 @@ def get_top5_work_activities(onetsoc_code):
         #print(row)
         occupation_work_activities.append(row)
     return occupation_work_activities
+
+def occupation_details_tab(onetsoc_code):
+    tabs = dcc.Tabs([
+                    dcc.Tab(label = "About",
+                            children = [
+                                html.P(
+                                    children = [get_occupation_description(onetsoc_code)]
+                                ),
+                                html.H3(children = ["Tasks"]),
+                                occupation_tasks_content(onetsoc_code)
+
+                            ]
+                        ),
+                    dcc.Tab(label = "Qualification",
+                            children = [
+                                html.P(
+                                    children = [get_occupation_description(onetsoc_code)]
+                                )
+                            ]
+                        ),
+    ])
+    return tabs
