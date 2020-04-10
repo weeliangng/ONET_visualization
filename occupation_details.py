@@ -68,10 +68,34 @@ def occupation_activities_content(onetsoc_code):
     return html.Ul(children = [html.Li(activity[0] + " - " + activity[1]) for activity in get_top5_work_activities(onetsoc_code)])
 
 def default_sidebar():
-    children = [
-                html.H3(id="Instructions", children = ["Instructions"]),
-    ]
-    return children
+    tabs = dcc.Tabs([
+                    dcc.Tab(label = "Welcome",
+                            children = [
+                                
+                                html.P(children = ["""This visualization is developed to help job seekers identify other occupations similar to their existing occupation.
+                                Every occupation has 10 other occupations that have been identified to be closely related by ONET. The lower the relatedness ranking, the more closely
+                                related the occupation is."""]),
+                                html.H5(children = ["How to use"]),
+                                dcc.Markdown("""
+                                **To add an outward occupation graph:**
+                                * Select the occupation in the dropdown
+                                * Choose the relatedness filter range (lower the ranking, the more closely related)
+                                  * Please use a lower distance when a larger relatedness filter range is set in order to reduce the number of occupations added
+                                * Choose the distance from the selected occupation
+                                  * Distance > 1 will further add other occupations that are not directly related to the selected occupation
+                                  * Please use a smaller relatedness filter range when a larger distance is set in order to reduce the number of occupations added
+                                
+                                **To add occupations pointing to a selected occupation:**
+                                * Select the occupation in the graph
+                                * Select the relatedness filter range
+                                  * Note that some occupations do not have any occupations within the selected relatedness range pointing towards it. In that case no occupation will be added.
+                                * Click on "Add" Button
+                                """)
+
+                            ]
+                        ),
+    ])
+    return tabs
 
 def occupation_details_tab(onetsoc_code):
     tabs = dcc.Tabs([
@@ -80,19 +104,26 @@ def occupation_details_tab(onetsoc_code):
                                 html.P(
                                     children = [get_occupation_description(onetsoc_code)]
                                 ),
-                                html.H3(children = ["Tasks"]),
+                                html.H5(children = ["Tasks"]),
                                 occupation_tasks_content(onetsoc_code),
-                                html.H3(children = ["Top 5 work activities"]),
+                                html.H5(children = ["Top 5 work activities"]),
                                 occupation_activities_content(onetsoc_code)
 
                             ]
                         ),
                     dcc.Tab(label = "Qualification",
                             children = [
-                                html.H3(children = ["Education"]),
+                                html.H5(children = ["Education"]),
                                 occupation_content(onetsoc_code)
 
                             ]
                         ),
+                    dcc.Tab(label = "Openings",
+                            children = [
+
+
+                            ]
+                        ),
+                    
     ])
     return tabs
