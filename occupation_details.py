@@ -2,6 +2,7 @@ import sqlite3
 import dash_core_components as dcc
 import dash_html_components as html
 from network_logic import get_occupation_onetsocCode_dict
+import dash_bootstrap_components as dbc
 
 def get_occupation_description(onetsoc_code):
     conn = sqlite3.connect('./data/ONET.sqlite')
@@ -69,8 +70,8 @@ def occupation_activities_content(onetsoc_code):
     return html.Ul(children = [html.Li(activity[0] + " - " + activity[1]) for activity in get_top5_work_activities(onetsoc_code)])
 
 def default_sidebar():
-    tabs = dcc.Tabs([
-                    dcc.Tab(label = "Welcome",
+    tabs = dbc.Tabs([
+                    dbc.Tab(label = "Welcome", className = "mx-3",
                             children = [
                                 
                                 html.P(children = ["""This visualization was developed to help job seekers identify other occupations similar to their existing occupation.
@@ -121,8 +122,8 @@ def default_sidebar():
     return tabs
 
 def occupation_details_tab(onetsoc_code):
-    tabs = dcc.Tabs([
-                    dcc.Tab(label = "About",
+    tabs = dbc.Tabs([
+                    dbc.Tab(label = "About", className = "mx-3",
                             children = [
                                 html.H5(get_occupation_onetsocCode_dict()[onetsoc_code]),
                                 html.P(
@@ -135,12 +136,14 @@ def occupation_details_tab(onetsoc_code):
 
                             ]
                         ),
-                    dcc.Tab(label = "Qualification",
+                    dbc.Tab(label = "Qualification", className = "mx-3",
                             children = [
                                 html.H5(children = ["Education"]),
                                 occupation_content(onetsoc_code)
 
                             ]
+                        ),
+                    dbc.Tab(label="Jobs - coming soon", className = "mx-3", disabled=True
                         ),
 
                     

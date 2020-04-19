@@ -1,5 +1,6 @@
 import dash
 import dash_core_components as dcc
+import dash_bootstrap_components as dbc
 import dash_html_components as html
 from dash.dependencies import Input, Output, State
 import dash_cytoscape as cyto
@@ -14,9 +15,34 @@ def dropdown_occupations(exclude=[]):
             options.append({"label" : occ, "value": onet})
     return options
 
+instruction_modal =  dbc.Modal(
+                [
+                    dbc.ModalHeader("How to interact"),
+                    dbc.ModalBody(children = [
+                        dcc.Markdown(
+                            """
+                            * Click on the occupation node to select and show occupation details
+                            * Shift + drag to select multiple nodes
+                            * Click and drag to move and arrange occupation nodes
+                            """
+                        )
+                    ]),
+                    dbc.ModalFooter(children = [
+                            dcc.Checklist(id = "show_instruction_modal_checklist",
+                                        options=[{'label': 'Do not show again', 'value': 'hideModal'}],
+                                        value =[]),
+                            dbc.Button(
+                                "Close", id="close-centered", className="ml-auto"
+                            )]
+                    ),
+                ],
+                id="modal-centered",
+                centered=True,
+            )
+        
+            
 
-
-external_stylesheets = []#'https://codepen.io/chriddyp/pen/bWLwgP.css']
+external_stylesheets = ["https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"]#'https://codepen.io/chriddyp/pen/bWLwgP.css']
 
 app = dash.Dash(__name__, external_stylesheets = external_stylesheets)
 server = app.server
@@ -49,15 +75,15 @@ default_stylesheet = [
                 ]
 
 ######### Sidebar
-app.layout = html.Div(children=[
-    html.Div(className="three columns",
+app.layout = dbc.Row(children=[
+    dbc.Col(width= 3,
         id = "side_bar", style={"height": "100vh", "overflow": "scroll"},
         children=default_sidebar()
         ),
 
 #############################################################
 ###### GRAPH
-    html.Div(className="seven columns",
+    dbc.Col(width= 7,
         children=[
             cyto.Cytoscape(
                 id='network_graph',
@@ -71,7 +97,7 @@ app.layout = html.Div(children=[
         ]),
 #############################################################
 ###### Controls
-    html.Div(className="two columns", 
+    dbc.Col(width= 2, 
         children=[
         html.Div(children=[
                 html.Label("Layout"),
@@ -120,7 +146,7 @@ app.layout = html.Div(children=[
                     )
                 ])
                 ,
-                html.Button(id="add_out_occupation_node_button", children ="Add"),
+                dbc.Button(id="add_out_occupation_node_button", color = "primary", outline=True, children ="Add"),
                 html.Div(style={'marginBottom': 25, 'marginTop': 25}, children=[
                     html.H5("Add inward occupations to selected occupation node"),
                     html.Label(children ="Relatedness ranking filter."),
@@ -134,10 +160,11 @@ app.layout = html.Div(children=[
                     )
                     
                 ]),
-                html.Button(id="add_in_occupation_node_button", children ="Add"),
+                dbc.Button(id="add_in_occupation_node_button", color = "primary", outline=True, children ="Add"),
                 html.Hr(),
-                html.Button(id="show_occupation_button", children ="Show/hide occupation"),
-                html.Button(id="reset_graph_button", children ="Reset")
+                dbc.Button(id="show_occupation_button", color = "primary", outline=True, children ="Show/hide occupation"),
+                dbc.Button(id="reset_graph_button", color = "primary", outline=True, children ="Reset"),
+                instruction_modal
 
         ])
     ]),
@@ -220,7 +247,22 @@ def get_selected_occupation_details(selected_node, dropdown):
         return default_sidebar(),dropdown
     return occupation_details_tab(selected_node[-1]['id']), selected_node[-1]['id']
 
-
+@app.callback(
+    Output('modal-centered', 'is_open'),
+    [Input('add_out_occupation_node_button', 'n_clicks'),
+    Input('add_in_occupation_node_button', 'n_clicks'), 
+    Input("close-centered", "n_clicks")],
+    [State("show_instruction_modal_checklist", "value"),
+    State("modal-centered", "is_open")]
+)
+def show_modal(n1, n2, n3, show_instruction_modal_checklist, is_open):
+    if (n1 or n2 or n3) and len(show_instruction_modal_checklist) == 0 :
+        return not is_open
+    
+    elif (n3) and len(show_instruction_modal_checklist) >0 and is_open == True:
+        return  not is_open
+    else:
+        return is_open
 
 
 
