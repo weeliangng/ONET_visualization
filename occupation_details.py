@@ -91,7 +91,29 @@ def default_sidebar():
                                 * Select the relatedness filter range
                                   * Note that not all occupations have occupations within the selected relatedness range pointing towards it. In that case no occupation will be added.
                                 * Click on "Add" Button
-                                """)
+                                """),
+                                html.Hr(),
+                                html.Div(children=[
+                                    html.P(style = {"text-align": "center"},
+                                        children=[
+                                            html.A(href="https://services.onetcenter.org/", 
+                                                title="This site incorporates information from O*NET Web Services. Click to learn more.",
+                                                children=[html.Img(src="https://www.onetcenter.org/image/link/onet-in-it.svg", 
+                                                        style={"width": "130px", "height": "60px", "border": "none"}, 
+                                                        alt="O*NET in-it"
+                                                            )
+                                                            ]
+                                                )
+                                            ]
+                                            ),
+                                    html.P(children=[
+                                        "This site incorporates information from ",
+                                        html.A(href="https://services.onetcenter.org/", children = ["O*NET Web Services"]),
+                                        " by the U.S. Department of Labor, Employment and Training Administration (USDOL/ETA). O*NET&reg; is a trademark of USDOL/ETA."
+                                    ])
+                                ]
+
+                                )
 
                             ]
                         ),

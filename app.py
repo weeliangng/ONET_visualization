@@ -28,6 +28,26 @@ server = app.server
 #            {'data': {'source': 'two', 'target': 'one','label': 'Node 2 to 1'}}
 #        ]
 cyto.load_extra_layouts()
+
+default_stylesheet = [
+                    {'selector': 'node',
+                    'style': {
+                        'background-color': 'rgb(66, 117, 245)'
+                    }},
+                    {'selector': 'edge',
+                    'style': {
+                        'curve-style':'bezier',
+                        'target-arrow-shape': 'vee',
+                        'line-color': 'data(colour)',
+                        'target-arrow-color': 'data(colour)'
+                    }},
+                    {'selector': 'node:selected',
+                    'style': {
+                        'label': 'data(label)',
+                        'background-color': 'rgb(166, 117, 245)'
+                    }}
+                ]
+
 ######### Sidebar
 app.layout = html.Div(children=[
     html.Div(className="three columns",
@@ -44,24 +64,7 @@ app.layout = html.Div(children=[
                 layout={'name': 'cola'},
                 style={'width': '100%', 'height': '100vh'},
                 boxSelectionEnabled = True,
-                stylesheet= [
-                    {'selector': 'node',
-                    'style': {
-                        'label': 'data(label)',
-                        'background-color': 'rgb(66, 117, 245)'
-                    }},
-                    {'selector': 'edge',
-                    'style': {
-                        'curve-style':'bezier',
-                        'target-arrow-shape': 'vee',
-                        'line-color': 'data(colour)',
-                        'target-arrow-color': 'data(colour)'
-                    }},
-                    {'selector': ':selected',
-                    'style': {
-                        'background-color': 'rgb(166, 117, 245)'
-                    }}
-                ],
+                stylesheet= default_stylesheet,
                 elements=[]
            
             )
@@ -133,28 +136,9 @@ app.layout = html.Div(children=[
                 ]),
                 html.Button(id="add_in_occupation_node_button", children ="Add"),
                 html.Hr(),
-                html.Button(id="reset_graph_button", children ="Reset"),
-                html.Div(children=[
-                    html.P(style = {"text-align": "center"},
-                        children=[
-                            html.A(href="https://services.onetcenter.org/", 
-                                title="This site incorporates information from O*NET Web Services. Click to learn more.",
-                                children=[html.Img(src="https://www.onetcenter.org/image/link/onet-in-it.svg", 
-                                        style={"width": "130px", "height": "60px", "border": "none"}, 
-                                        alt="O*NET in-it"
-                                            )
-                                            ]
-                                )
-                            ]
-                            ),
-                    html.P(children=[
-                        "This site incorporates information from ",
-                        html.A(href="https://services.onetcenter.org/", children = ["O*NET Web Services"]),
-                        " by the U.S. Department of Labor, Employment and Training Administration (USDOL/ETA). O*NET&reg; is a trademark of USDOL/ETA."
-                    ])
-                ]
+                html.Button(id="show_occupation_button", children ="Show/hide occupation"),
+                html.Button(id="reset_graph_button", children ="Reset")
 
-                )
         ])
     ]),
 
@@ -162,31 +146,55 @@ app.layout = html.Div(children=[
 
 @app.callback(
     [Output(component_id='network_graph', component_property='elements'),
-    Output(component_id='network_graph', component_property='layout')],
+    Output(component_id='network_graph', component_property='layout'),
+    Output(component_id='network_graph', component_property='stylesheet')],
     [Input(component_id='add_out_occupation_node_button', component_property='n_clicks_timestamp'),
-    Input(component_id='add_in_occupation_node_button', component_property='n_clicks_timestamp')],
+    Input(component_id='add_in_occupation_node_button', component_property='n_clicks_timestamp'),
+    Input(component_id='show_occupation_button', component_property='n_clicks_timestamp')],
     [State(component_id='layout_dropdown', component_property='value'),
     State(component_id='occupation_dropdown', component_property='value'),
     State(component_id='out_related_index_filter_slider', component_property='value'),
     State(component_id='distance_slider', component_property='value'),
     State(component_id='in_related_index_filter_slider', component_property='value'),
+    State(component_id='show_occupation_button', component_property='n_clicks'),
     State(component_id='network_graph', component_property='elements')]
 )
-def add_occupation(add_out_occupation_node_button, add_in_occupation_node_button, layout, onetsoc_code, out_related_index_filter, cutoff_distance, in_related_index_filter, existing_elements):
+def add_occupation(add_out_occupation_node_button, add_in_occupation_node_button,show_occupation_button, layout, onetsoc_code, out_related_index_filter, cutoff_distance, in_related_index_filter , show_occupation_toggle, existing_elements):
     elements = []
+    stylesheet = default_stylesheet
+    if show_occupation_toggle is None: 
+        show_occupation_button = 0
+        show_occupation_toggle= 0
+    if show_occupation_toggle % 2 == 0 :
+        stylesheet = default_stylesheet + [{'selector': 'node',
+                                                'style': {
+                                                'label': 'data(label)',
+                                                'background-color': 'rgb(66, 117, 245)'
+                                            }},
+                                             {'selector': 'node:selected',
+                                                'style': {
+                                                'label': 'data(label)',
+                                                'background-color': 'rgb(166, 117, 245)'
+                                                }}
+                                            ]
     if add_out_occupation_node_button is None and add_in_occupation_node_button is None:
-        return elements, {'name': 'circle'}
+        return elements, {'name': 'circle'}, stylesheet
     if add_out_occupation_node_button is None: add_out_occupation_node_button = 0
     if add_in_occupation_node_button is None: add_in_occupation_node_button = 0
-    if add_out_occupation_node_button > add_in_occupation_node_button:
+
+    buttons_click_order = sorted([add_out_occupation_node_button,add_in_occupation_node_button, show_occupation_button])
+
+    if add_out_occupation_node_button == buttons_click_order[-1]:
         elements = add_elements(onetsoc_code, related_index_filter = out_related_index_filter , cutoff = cutoff_distance)
         elements = [data for data in elements if data not in existing_elements]
         elements = elements + existing_elements
-    if add_in_occupation_node_button > add_out_occupation_node_button:
+    elif add_in_occupation_node_button == buttons_click_order[-1]:
         elements = add_elements(onetsoc_code, related_index_filter = in_related_index_filter , cutoff = 1, direction ="in")
         elements = [data for data in elements if data not in existing_elements]
         elements = elements + existing_elements
-    return elements, {'name': layout}
+    elif show_occupation_button == buttons_click_order[-1]:
+        elements =  existing_elements
+    return elements, {'name': layout}, stylesheet
 
 @app.callback(
     [Output(component_id='add_out_occupation_node_button', component_property='n_clicks_timestamp'),
