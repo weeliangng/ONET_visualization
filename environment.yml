@@ -9,5 +9,6 @@ dependencies:
   - jupyter
   - matplotlib
   - bleach
+  - dash-bootstrap-components
 prefix: C:\Users\weeli\Anaconda3\envs\onet_vis
 
