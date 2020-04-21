@@ -6,6 +6,9 @@ import dash_html_components as html
 
 import plotly.graph_objects as go
 
+from occupation_details import *
+
+
 with open("config.yml", 'r') as stream:
     try:
         config = yaml.safe_load(stream)
@@ -41,6 +44,8 @@ def remove_comma_plus_dollar(salary):
     return float(salary.replace(",","").replace("+","").replace("$",""))
 
 
+
+
 def get_skillsgap_json(OnetCodeSource, OnetCodeTarget, userId, api_key):
     request_url = "https://api.careeronestop.org/v1/skillgap/{userId}/{OnetCodeSource}/{OnetCodeTarget}/United%20States/25".format(userId = userId, 
                                                                                                                                     OnetCodeSource = OnetCodeSource, 
@@ -54,7 +59,7 @@ skills_gap = get_skillsgap_json(41303103, 41309901, userId, api_key)
 def salary_graph(skills_gap):
 
     text = [skills_gap["CurrentOccupationWage"], skills_gap["TargetOccupationWage"]]
-    x = [skills_gap["CurrentOccupationTitle"], skills_gap["TargetOccupationTitle"]]
+    x = ["Current", "Target"]
     y = list(map(remove_comma_plus_dollar, text))
     fig = go.Figure(data=[go.Bar(
             x=x, y=y,
@@ -69,6 +74,7 @@ def skillsgap_details_tab(OnetCodeSource, OnetCodeTarget):
     OnetCodeTarget = remove_dash_dot(OnetCodeTarget)
 
     skills_gap = get_skillsgap_json(OnetCodeSource, OnetCodeTarget, userId, api_key)
+
 
     tabs = dbc.Tabs([
                         dbc.Tab(label = "Salary",

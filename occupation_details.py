@@ -4,6 +4,8 @@ import dash_html_components as html
 from network_logic import get_occupation_onetsocCode_dict
 import dash_bootstrap_components as dbc
 
+from network_logic import get_occupation_onetsocCode_list
+
 def get_occupation_description(onetsoc_code):
     conn = sqlite3.connect('./data/ONET.sqlite')
     onetsoc_occupation_description_sql = "select * from occupation_data where onetsoc_code ='{}';".format(onetsoc_code)
@@ -69,8 +71,19 @@ def get_top5_work_activities(onetsoc_code):
 def occupation_activities_content(onetsoc_code):    
     return html.Ul(children = [html.Li(activity[0] + " - " + activity[1]) for activity in get_top5_work_activities(onetsoc_code)])
 
+def remove_dash_dot(onetcode):
+    return onetcode.replace(".","").replace("-","")
+
+def dropdown_occupations(exclude=[]):
+    options = []
+    for onet_occ in get_occupation_onetsocCode_list():
+        for onet,occ in onet_occ.items():
+            options.append({"label" : occ, "value": remove_dash_dot(onet)})
+    return options
+
 def default_sidebar():
-    tabs = dbc.Tabs([
+    tabs = dbc.Tabs(id = "default_sidebar_tabs",
+                    children = [
                     dbc.Tab(label = "Welcome", className = "mx-3",
                             children = [
                                 
@@ -118,6 +131,22 @@ def default_sidebar():
 
                             ]
                         ),
+                    dbc.Tab(label = "Gap Analysis", className = "mx-3",
+                            children =[
+                                html.Div(className = "mx-3",
+                                        children = [
+                                                    html.Label("Current Occupation"),
+                                                    dcc.Dropdown(id="current_occupation_dropdown",
+                                                                    options =dropdown_occupations()),
+                                                    html.Label("Target Occupation"),
+                                                    dcc.Dropdown(id="target_occupation_dropdown",
+                                                                    options =dropdown_occupations()),
+                                                    html.Hr(),
+                                                    ]
+                                        ),
+                                html.Div(id = "gap_analysis_tabs")
+                                        ]
+                                    )
     ])
     return tabs
 

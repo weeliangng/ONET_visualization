@@ -100,7 +100,7 @@ app.layout = dbc.Row(children=[
 ###### Controls
     dbc.Col(width= 2, 
         children=[
-        html.Div(children=[
+        html.Div(className = "mx-3", children=[
                 html.Label("Layout"),
                 dcc.Dropdown(id="layout_dropdown",
                     options=[
@@ -240,19 +240,36 @@ def reset_graph(reset_graph_button):
 @app.callback(
     [Output('side_bar', 'children'),
     Output('occupation_dropdown', 'value')],
-    [Input('network_graph', 'selectedNodeData'),
-    Input('network_graph', 'selectedEdgeData')],
+    [Input('network_graph', 'selectedNodeData')],
     [State('occupation_dropdown', 'value')]
 )
-def get_selected_occupation_details(selected_node, selected_edge ,dropdown):
-    if not selected_node and not selected_edge:
+def get_selected_occupation_details(selected_node ,dropdown):
+    if not selected_node:
         return default_sidebar(),dropdown
     elif selected_node:
         return occupation_details_tab(selected_node[-1]['id']), selected_node[-1]['id']
-    elif selected_edge:
-        return skillsgap_details_tab(selected_edge[-1]['source'], selected_edge[-1]['target']), dropdown
 
+@app.callback(
+    [Output("current_occupation_dropdown", "value"),
+    Output("target_occupation_dropdown", "value"),
+    Output("default_sidebar_tabs", "active_tab" )],
+    [Input('network_graph', 'selectedEdgeData')]
+)
+def update_gap_analysis_dropdown(selected_edge):
+    if not selected_edge:
+        return None, None, None
 
+    return remove_dash_dot(selected_edge[-1]["source"]), remove_dash_dot(selected_edge[-1]["target"]), "tab-1"
+
+@app.callback(
+    Output("gap_analysis_tabs", "children"),
+    [Input("current_occupation_dropdown", "value"),
+    Input("target_occupation_dropdown", "value")]
+)
+def perform_gap_analysis(current_occupation, target_occupation):
+    if not current_occupation or not target_occupation:
+        return None
+    return skillsgap_details_tab(current_occupation, target_occupation)
 
 @app.callback(
     Output('modal-centered', 'is_open'),
