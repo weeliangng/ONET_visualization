@@ -1,5 +1,10 @@
 import yaml
 import requests
+import dash_bootstrap_components as dbc
+import dash_core_components as dcc
+import dash_html_components as html
+
+import plotly.graph_objects as go
 
 with open("config.yml", 'r') as stream:
     try:
@@ -30,16 +35,50 @@ api_key = "Bearer "+ config["config"]["api"]
 # TargetCertificates
 # LocationState
 
+def remove_dash_dot(onetcode):
+    return onetcode.replace(".","").replace("-","")
+def remove_comma_plus_dollar(salary):
+    return float(salary.replace(",","").replace("+","").replace("$",""))
+
 
 def get_skillsgap_json(OnetCodeSource, OnetCodeTarget, userId, api_key):
     request_url = "https://api.careeronestop.org/v1/skillgap/{userId}/{OnetCodeSource}/{OnetCodeTarget}/United%20States/25".format(userId = userId, 
                                                                                                                                     OnetCodeSource = OnetCodeSource, 
                                                                                                                                     OnetCodeTarget= OnetCodeTarget )
     response  = requests.get(request_url, headers = {"Authorization": api_key})
+    print(response.status_code)
     return response.json()
 
 skills_gap = get_skillsgap_json(41303103, 41309901, userId, api_key)
 
-for gap in skills_gap.keys():
-    print(gap)
+def salary_graph(skills_gap):
 
+    text = [skills_gap["CurrentOccupationWage"], skills_gap["TargetOccupationWage"]]
+    x = [skills_gap["CurrentOccupationTitle"], skills_gap["TargetOccupationTitle"]]
+    y = list(map(remove_comma_plus_dollar, text))
+    fig = go.Figure(data=[go.Bar(
+            x=x, y=y,
+            text=text,
+            textposition='auto',
+        )])
+
+    return dcc.Graph(figure=fig)
+
+def skillsgap_details_tab(OnetCodeSource, OnetCodeTarget):
+    OnetCodeSource = remove_dash_dot(OnetCodeSource)
+    OnetCodeTarget = remove_dash_dot(OnetCodeTarget)
+
+    skills_gap = get_skillsgap_json(OnetCodeSource, OnetCodeTarget, userId, api_key)
+
+    tabs = dbc.Tabs([
+                        dbc.Tab(label = "Salary",
+                                children = [salary_graph(skills_gap)]
+                            ),
+                        dbc.Tab(label = "Skills"),
+                        dbc.Tab(label = "Education")
+
+
+
+    ])
+
+    return tabs

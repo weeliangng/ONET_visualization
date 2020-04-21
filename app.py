@@ -7,6 +7,7 @@ import dash_cytoscape as cyto
 
 from network_logic import *
 from occupation_details import *
+from skillsgap_details import *
 
 def dropdown_occupations(exclude=[]):
     options = []
@@ -239,13 +240,19 @@ def reset_graph(reset_graph_button):
 @app.callback(
     [Output('side_bar', 'children'),
     Output('occupation_dropdown', 'value')],
-    [Input('network_graph', 'selectedNodeData')],
+    [Input('network_graph', 'selectedNodeData'),
+    Input('network_graph', 'selectedEdgeData')],
     [State('occupation_dropdown', 'value')]
 )
-def get_selected_occupation_details(selected_node, dropdown):
-    if not selected_node:
+def get_selected_occupation_details(selected_node, selected_edge ,dropdown):
+    if not selected_node and not selected_edge:
         return default_sidebar(),dropdown
-    return occupation_details_tab(selected_node[-1]['id']), selected_node[-1]['id']
+    elif selected_node:
+        return occupation_details_tab(selected_node[-1]['id']), selected_node[-1]['id']
+    elif selected_edge:
+        return skillsgap_details_tab(selected_edge[-1]['source'], selected_edge[-1]['target']), dropdown
+
+
 
 @app.callback(
     Output('modal-centered', 'is_open'),
