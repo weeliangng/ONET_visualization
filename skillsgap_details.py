@@ -74,14 +74,18 @@ def skillsgap_details_tab(OnetCodeSource, OnetCodeTarget):
     OnetCodeTarget = remove_dash_dot(OnetCodeTarget)
 
     skills_gap = get_skillsgap_json(OnetCodeSource, OnetCodeTarget, userId, api_key)
-
+    
+    print(skills_gap["OccupationSkillsMatchList"])
 
     tabs = dbc.Tabs([
                         dbc.Tab(label = "Salary",
                                 children = [salary_graph(skills_gap)]
                             ),
-                        dbc.Tab(label = "Skills"),
-                        dbc.Tab(label = "Education")
+                        dbc.Tab(label = "Similarity",
+                                children = [match["Title"] for match in skills_gap["OccupationSkillsMatchList"]]
+                                ),
+                        dbc.Tab(label = "Gaps"),
+                        dbc.Tab(label = "Typical Level Of Training")
 
 
 

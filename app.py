@@ -239,27 +239,25 @@ def reset_graph(reset_graph_button):
 
 @app.callback(
     [Output('side_bar', 'children'),
-    Output('occupation_dropdown', 'value')],
-    [Input('network_graph', 'selectedNodeData')],
-    [State('occupation_dropdown', 'value')]
-)
-def get_selected_occupation_details(selected_node ,dropdown):
-    if not selected_node:
-        return default_sidebar(),dropdown
-    elif selected_node:
-        return occupation_details_tab(selected_node[-1]['id']), selected_node[-1]['id']
-
-@app.callback(
-    [Output("current_occupation_dropdown", "value"),
+    Output('occupation_dropdown', 'value'),
+    Output("current_occupation_dropdown", "value"),
     Output("target_occupation_dropdown", "value"),
     Output("default_sidebar_tabs", "active_tab" )],
-    [Input('network_graph', 'selectedEdgeData')]
+    [Input('network_graph', 'selectedNodeData'),
+    Input('network_graph', 'selectedEdgeData')],
+    [State('occupation_dropdown', 'value')]
 )
-def update_gap_analysis_dropdown(selected_edge):
-    if not selected_edge:
-        return None, None, None
+def get_selected_occupation_details(selected_node , selected_edge, occupation_dropdown):
+    if not selected_node and not selected_edge:
+        print("a")
+        return default_sidebar(), occupation_dropdown, None, None, None
+    elif selected_node:
+        print("b")
+        return occupation_details_tab(selected_node[-1]['id']), selected_node[-1]['id'], None, None, None
+    elif selected_edge:
+        print("c")
+        return default_sidebar(), occupation_dropdown, remove_dash_dot(selected_edge[-1]["source"]), remove_dash_dot(selected_edge[-1]["target"]), "tab-1"
 
-    return remove_dash_dot(selected_edge[-1]["source"]), remove_dash_dot(selected_edge[-1]["target"]), "tab-1"
 
 @app.callback(
     Output("gap_analysis_tabs", "children"),
