@@ -69,22 +69,57 @@ def salary_graph(skills_gap):
 
     return dcc.Graph(figure=fig)
 
-def skillsgap_details_tab(OnetCodeSource, OnetCodeTarget):
+def similarity_tab_details(skills_gap):
+    similarity_list = skills_gap["OccupationSkillsMatchList"]
+    details = []
+    if similarity_list is None :
+        details.append(html.P(html.Em("No data available")))
+        return details
+
+    for similarity in similarity_list:
+        details.append(html.P(children = 
+                                    [
+                                    html.Strong(similarity["Title"]),
+                                    html.Br(),
+                                    similarity["Description"]
+                                    ]))
+    return details
+
+def differences_tab_details(skills_gap):
+    differences_list = skills_gap["OccupationSkillsGapList"]
+    details = []
+    if differences_list is None :
+        details.append(html.P(html.Em("No data available")))
+        return details
+
+    if differences_list is None : return details
+    for difference in differences_list:
+        details.append(html.P(children = 
+                                    [
+                                    html.Strong(difference["Title"]),
+                                    html.Br(),
+                                    difference["Description"]
+                                    ]))
+    return details
+
+def skillsgap_details_tabs(OnetCodeSource, OnetCodeTarget):
     OnetCodeSource = remove_dash_dot(OnetCodeSource)
     OnetCodeTarget = remove_dash_dot(OnetCodeTarget)
 
     skills_gap = get_skillsgap_json(OnetCodeSource, OnetCodeTarget, userId, api_key)
     
-    print(skills_gap["OccupationSkillsMatchList"])
+    print(skills_gap)
 
     tabs = dbc.Tabs([
                         dbc.Tab(label = "Salary",
                                 children = [salary_graph(skills_gap)]
                             ),
                         dbc.Tab(label = "Similarity",
-                                children = [match["Title"] for match in skills_gap["OccupationSkillsMatchList"]]
+                                children = similarity_tab_details(skills_gap)
                                 ),
-                        dbc.Tab(label = "Gaps"),
+                        dbc.Tab(label = "Gaps",
+                                children = differences_tab_details(skills_gap)
+                                ),
                         dbc.Tab(label = "Typical Level Of Training")
 
 

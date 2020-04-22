@@ -267,7 +267,7 @@ def get_selected_occupation_details(selected_node , selected_edge, occupation_dr
 def perform_gap_analysis(current_occupation, target_occupation):
     if not current_occupation or not target_occupation:
         return None
-    return skillsgap_details_tab(current_occupation, target_occupation)
+    return skillsgap_details_tabs(current_occupation, target_occupation)
 
 @app.callback(
     Output('modal-centered', 'is_open'),
