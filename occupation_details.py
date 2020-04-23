@@ -78,7 +78,7 @@ def dropdown_occupations(exclude=[]):
     options = []
     for onet_occ in get_occupation_onetsocCode_list():
         for onet,occ in onet_occ.items():
-            options.append({"label" : occ, "value": remove_dash_dot(onet)})
+            options.append({"label" : occ, "value": onet})
     return options
 
 def default_sidebar():
@@ -142,9 +142,10 @@ def default_sidebar():
                                                     dcc.Dropdown(id="target_occupation_dropdown",
                                                                     options =dropdown_occupations()),
                                                     html.Hr(),
+                                                    dcc.Store(id='memory-skills_gap')
                                                     ]
                                         ),
-                                html.Div(id = "gap_analysis_tabs")
+                                html.Div(id = "gap_analysis_tab")
                                         ]
                                     )
     ])

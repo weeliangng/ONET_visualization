@@ -54,7 +54,6 @@ def get_skillsgap_json(OnetCodeSource, OnetCodeTarget, userId, api_key):
     print(response.status_code)
     return response.json()
 
-skills_gap = get_skillsgap_json(41303103, 41309901, userId, api_key)
 
 def salary_graph(skills_gap):
 
@@ -85,45 +84,73 @@ def similarity_tab_details(skills_gap):
                                     ]))
     return details
 
-def differences_tab_details(skills_gap):
+def get_skills_knowledge_level(onetsoc_code, element_id):
+    conn = sqlite3.connect('./data/ONET.sqlite')
+    onetsoc_skills_knowledge_level_sql = """select data_value from (
+                                                                    select  * from knowledge
+                                                                    union
+                                                                    select * from skills ) as skills_knowledge
+
+                                                                    where skills_knowledge.scale_id = 'LV'
+                                                                    and onetsoc_code = '{}'
+                                                                    and element_id = '{}'
+                                                                    ;""".format(onetsoc_code, element_id)
+    c = conn.cursor()
+    skills_knowledge_level = list()
+    for row in c.execute(onetsoc_skills_knowledge_level_sql):
+        #print(row)
+        skills_knowledge_level.append(row[0])
+    return skills_knowledge_level
+
+def difference_graph(OnetCodeSource, OnetCodeTarget, element_id):
+    source_level = float(get_skills_knowledge_level(OnetCodeSource, element_id)[0])
+    target_level = float(get_skills_knowledge_level(OnetCodeTarget, element_id)[0])
+    x = ["Current", "Target"]
+    y = [source_level, target_level]
+    fig = go.Figure(
+                    data=[go.Bar(
+                                x=x, y=y,
+                                textposition='auto'
+        )])
+    return dcc.Graph(figure=fig)
+
+def differences_tab_details(skills_gap, OnetCodeSource, OnetCodeTarget):
     differences_list = skills_gap["OccupationSkillsGapList"]
     details = []
     if differences_list is None :
         details.append(html.P(html.Em("No data available")))
         return details
 
-    if differences_list is None : return details
     for difference in differences_list:
         details.append(html.P(children = 
                                     [
                                     html.Strong(difference["Title"]),
                                     html.Br(),
                                     difference["Description"]
-                                    ]))
+                                    ]
+                                    ))
+        details.append(difference_graph(OnetCodeSource, OnetCodeTarget, difference["SkillId"]))
     return details
 
 def skillsgap_details_tabs(OnetCodeSource, OnetCodeTarget):
-    OnetCodeSource = remove_dash_dot(OnetCodeSource)
-    OnetCodeTarget = remove_dash_dot(OnetCodeTarget)
 
-    skills_gap = get_skillsgap_json(OnetCodeSource, OnetCodeTarget, userId, api_key)
+    OnetCodeSource_reformat = remove_dash_dot(OnetCodeSource)
+    OnetCodeTarget_reformat = remove_dash_dot(OnetCodeTarget)
     
-    print(skills_gap)
-
-    tabs = dbc.Tabs([
+    tabs = html.Div([
+            dbc.Tabs(id = "skillsgap_details_tabs",
+                    children = [
                         dbc.Tab(label = "Salary",
-                                children = [salary_graph(skills_gap)]
                             ),
                         dbc.Tab(label = "Similarity",
-                                children = similarity_tab_details(skills_gap)
                                 ),
                         dbc.Tab(label = "Gaps",
-                                children = differences_tab_details(skills_gap)
                                 ),
                         dbc.Tab(label = "Typical Level Of Training")
 
-
-
-    ])
+            ]),
+            html.Div(id = "skillsgap_details_content")
+    ]
+    )
 
     return tabs

@@ -46,6 +46,7 @@ instruction_modal =  dbc.Modal(
 external_stylesheets = ["https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"]#'https://codepen.io/chriddyp/pen/bWLwgP.css']
 
 app = dash.Dash(__name__, external_stylesheets = external_stylesheets)
+app.config['suppress_callback_exceptions'] = True
 server = app.server
 
 #nodes = [{'data': {'id': 'one', 'label': 'Node 1'}, 'position': {'x': 0, 'y': 0}},
@@ -256,18 +257,58 @@ def get_selected_occupation_details(selected_node , selected_edge, occupation_dr
         return occupation_details_tab(selected_node[-1]['id']), selected_node[-1]['id'], None, None, None
     elif selected_edge:
         print("c")
-        return default_sidebar(), occupation_dropdown, remove_dash_dot(selected_edge[-1]["source"]), remove_dash_dot(selected_edge[-1]["target"]), "tab-1"
-
+        return default_sidebar(), occupation_dropdown, selected_edge[-1]["source"], selected_edge[-1]["target"], "tab-1"
 
 @app.callback(
-    Output("gap_analysis_tabs", "children"),
+    Output('memory-skills_gap', 'data'),
     [Input("current_occupation_dropdown", "value"),
     Input("target_occupation_dropdown", "value")]
 )
 def perform_gap_analysis(current_occupation, target_occupation):
     if not current_occupation or not target_occupation:
-        return None
-    return skillsgap_details_tabs(current_occupation, target_occupation)
+        return None, None
+    OnetCodeSource_reformat = remove_dash_dot(current_occupation)
+    OnetCodeTarget_reformat = remove_dash_dot(target_occupation)
+    skills_gap = get_skillsgap_json(OnetCodeSource_reformat, OnetCodeTarget_reformat, userId, api_key)
+    return skills_gap
+
+
+
+@app.callback(
+    [Output("gap_analysis_tab", "children"),
+    Output("skillsgap_details_tabs", "active_tab")],
+    [Input("memory-skills_gap", "data")],
+    [State("current_occupation_dropdown", "value"),
+    State("target_occupation_dropdown", "value")]
+
+)
+def add_skillsgap_details_tab(skills_gap, OnetCodeSource, OnetCodeTarget):
+    #OnetCodeSource_reformat = remove_dash_dot(OnetCodeSource)
+    #OnetCodeTarget_reformat = remove_dash_dot(OnetCodeTarget)
+    if not OnetCodeSource or not OnetCodeTarget:
+        return None, None
+    return skillsgap_details_tabs(OnetCodeSource, OnetCodeTarget), "tab-0"
+
+
+@app.callback(
+    Output("skillsgap_details_content","children"),
+    [Input("skillsgap_details_tabs","active_tab"),
+    Input("memory-skills_gap", "data"),
+    Input("current_occupation_dropdown", "value"),
+    Input("target_occupation_dropdown", "value")]
+)
+def switch_skillsgap_details_tab(active_tab, skills_gap, OnetCodeSource, OnetCodeTarget):
+    salary_graph_0 = salary_graph(skills_gap)
+    print(salary_graph_0 is None)
+    similarity_tab_details_1 = similarity_tab_details(skills_gap)
+    differences_tab_details_2 = differences_tab_details(skills_gap, OnetCodeSource, OnetCodeTarget)
+    if active_tab == "tab-0":
+        return salary_graph_0
+    elif active_tab == "tab-1":
+        return similarity_tab_details_1
+    elif active_tab == "tab-2":
+        return differences_tab_details_2
+
 
 @app.callback(
     Output('modal-centered', 'is_open'),
