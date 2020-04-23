@@ -298,16 +298,13 @@ def add_skillsgap_details_tab(skills_gap, OnetCodeSource, OnetCodeTarget):
     Input("target_occupation_dropdown", "value")]
 )
 def switch_skillsgap_details_tab(active_tab, skills_gap, OnetCodeSource, OnetCodeTarget):
-    salary_graph_0 = salary_graph(skills_gap)
-    print(salary_graph_0 is None)
-    similarity_tab_details_1 = similarity_tab_details(skills_gap)
-    differences_tab_details_2 = differences_tab_details(skills_gap, OnetCodeSource, OnetCodeTarget)
+
     if active_tab == "tab-0":
-        return salary_graph_0
+        return salary_graph(skills_gap)
     elif active_tab == "tab-1":
-        return similarity_tab_details_1
+        return similarity_tab_details(skills_gap)
     elif active_tab == "tab-2":
-        return differences_tab_details_2
+        return differences_tab_details(skills_gap, OnetCodeSource, OnetCodeTarget)
 
 
 @app.callback(

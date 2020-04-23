@@ -149,7 +149,7 @@ def skillsgap_details_tabs(OnetCodeSource, OnetCodeTarget):
                         dbc.Tab(label = "Typical Level Of Training")
 
             ]),
-            html.Div(id = "skillsgap_details_content")
+            dbc.Spinner(html.Div(id = "skillsgap_details_content"))
     ]
     )
 
