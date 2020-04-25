@@ -72,7 +72,7 @@ def salary_graph(skills_gap):
                     html.Strong("Salary Data from the United States - in US Dollars"),
                     dcc.Graph(figure=fig)
                 ])
-
+    print("salary graph generated")
     return details
 
 def similarity_tab_details(skills_gap):
