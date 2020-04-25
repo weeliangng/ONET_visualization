@@ -300,7 +300,7 @@ def add_skillsgap_details_tab(skills_gap, OnetCodeSource, OnetCodeTarget, active
     Input("target_occupation_dropdown", "value")]
 )
 def switch_skillsgap_details_tab(active_tab, skills_gap, OnetCodeSource, OnetCodeTarget):
-    #print(skills_gap)
+    print(skills_gap)
     if not OnetCodeSource or not OnetCodeTarget or not skills_gap:
         return  None
     elif active_tab == "tab-0":
