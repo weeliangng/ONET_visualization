@@ -5,7 +5,7 @@ dependencies:
   - python=3.7
   - networkx
   - dash_cytoscape
-  - dash
+  - dash=1.9.1
   - jupyter
   - matplotlib
   - bleach

@@ -183,8 +183,9 @@ app.layout = dbc.Row(children=[
     Output(component_id='network_graph', component_property='stylesheet')],
     [Input(component_id='add_out_occupation_node_button', component_property='n_clicks_timestamp'),
     Input(component_id='add_in_occupation_node_button', component_property='n_clicks_timestamp'),
-    Input(component_id='show_occupation_button', component_property='n_clicks_timestamp')],
-    [State(component_id='layout_dropdown', component_property='value'),
+    Input(component_id='show_occupation_button', component_property='n_clicks_timestamp'),
+    Input(component_id='layout_dropdown', component_property='value')],
+    [
     State(component_id='occupation_dropdown', component_property='value'),
     State(component_id='out_related_index_filter_slider', component_property='value'),
     State(component_id='distance_slider', component_property='value'),
