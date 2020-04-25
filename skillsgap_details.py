@@ -41,7 +41,9 @@ api_key = "Bearer "+ config["config"]["api"]
 def remove_dash_dot(onetcode):
     return onetcode.replace(".","").replace("-","")
 def remove_comma_plus_dollar(salary):
-    return float(salary.replace(",","").replace("+","").replace("$",""))
+    if salary == "Not Available": return 1000
+    else:
+        return float(salary.replace(",","").replace("+","").replace("$",""))
 
 
 
@@ -58,6 +60,7 @@ def get_skillsgap_json(OnetCodeSource, OnetCodeTarget, userId, api_key):
 def salary_graph(skills_gap):
 
     text = [skills_gap["CurrentOccupationWage"], skills_gap["TargetOccupationWage"]]
+
     x = ["Current", "Target"]
     y = list(map(remove_comma_plus_dollar, text))
     fig = go.Figure(data=[go.Bar(
@@ -65,8 +68,12 @@ def salary_graph(skills_gap):
             text=text,
             textposition='auto',
         )])
+    details = html.Div(children = [
+                    html.Strong("Salary Data from the United States - in US Dollars"),
+                    dcc.Graph(figure=fig)
+                ])
 
-    return dcc.Graph(figure=fig)
+    return details
 
 def similarity_tab_details(skills_gap):
     similarity_list = skills_gap["OccupationSkillsMatchList"]
@@ -111,7 +118,13 @@ def difference_graph(OnetCodeSource, OnetCodeTarget, element_id):
                     data=[go.Bar(
                                 x=x, y=y,
                                 textposition='auto'
-        )])
+                                )
+                                ])
+    fig.update_layout(
+        yaxis =dict(range=[0,7]),
+        margin = dict(t=0,
+                    b=5)
+    )
     return dcc.Graph(figure=fig)
 
 def differences_tab_details(skills_gap, OnetCodeSource, OnetCodeTarget):
@@ -132,10 +145,23 @@ def differences_tab_details(skills_gap, OnetCodeSource, OnetCodeTarget):
         details.append(difference_graph(OnetCodeSource, OnetCodeTarget, difference["SkillId"]))
     return details
 
-def skillsgap_details_tabs(OnetCodeSource, OnetCodeTarget):
+def training_tab_details(skills_gap,  OnetCodeSource, OnetCodeTarget):
+    details =[]
+    details.append(html.P(children = 
+                                [
+                                html.Strong("Typical Education Title of {}".format(skills_gap["CurrentOccupationTitle"])),
+                                html.Br(),
+                                skills_gap["CurrentEducationTitle"],
+                                html.Br(),
+                                html.Strong("Typical Education Title of {}".format(skills_gap["TargetOccupationTitle"])),
+                                html.Br(),
+                                skills_gap["TargetEducationTitle"]
+                                ]
+                                ))
+    return details
 
-    OnetCodeSource_reformat = remove_dash_dot(OnetCodeSource)
-    OnetCodeTarget_reformat = remove_dash_dot(OnetCodeTarget)
+def skillsgap_details_tabs():
+
     
     tabs = html.Div([
             dbc.Tabs(id = "skillsgap_details_tabs",

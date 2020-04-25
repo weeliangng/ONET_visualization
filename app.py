@@ -23,6 +23,7 @@ instruction_modal =  dbc.Modal(
                         dcc.Markdown(
                             """
                             * Click on the occupation node to select and show occupation details
+                            * Click on the edge between occupation nodes to show the gap between the two occupations
                             * Shift + drag to select multiple nodes
                             * Click and drag to move and arrange occupation nodes
                             """
@@ -43,9 +44,12 @@ instruction_modal =  dbc.Modal(
         
             
 
-external_stylesheets = ["https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"]#'https://codepen.io/chriddyp/pen/bWLwgP.css']
+external_stylesheets = ["https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"]
+external_scripts = [{"src": "https://kit.fontawesome.com/ec26958d6d.js",
+                    "crossorigin": "anonymous"}]
 
-app = dash.Dash(__name__, external_stylesheets = external_stylesheets)
+
+app = dash.Dash(__name__, external_stylesheets = external_stylesheets, external_scripts = external_scripts)
 app.config['suppress_callback_exceptions'] = True
 server = app.server
 
@@ -250,13 +254,10 @@ def reset_graph(reset_graph_button):
 )
 def get_selected_occupation_details(selected_node , selected_edge, occupation_dropdown):
     if not selected_node and not selected_edge:
-        print("a")
         return default_sidebar(), occupation_dropdown, None, None, None
     elif selected_node:
-        print("b")
         return occupation_details_tab(selected_node[-1]['id']), selected_node[-1]['id'], None, None, None
     elif selected_edge:
-        print("c")
         return default_sidebar(), occupation_dropdown, selected_edge[-1]["source"], selected_edge[-1]["target"], "tab-1"
 
 @app.callback(
@@ -279,15 +280,16 @@ def perform_gap_analysis(current_occupation, target_occupation):
     Output("skillsgap_details_tabs", "active_tab")],
     [Input("memory-skills_gap", "data")],
     [State("current_occupation_dropdown", "value"),
-    State("target_occupation_dropdown", "value")]
+    State("target_occupation_dropdown", "value"),
+    State("skillsgap_details_tabs", "active_tab")]
 
 )
-def add_skillsgap_details_tab(skills_gap, OnetCodeSource, OnetCodeTarget):
-    #OnetCodeSource_reformat = remove_dash_dot(OnetCodeSource)
-    #OnetCodeTarget_reformat = remove_dash_dot(OnetCodeTarget)
+def add_skillsgap_details_tab(skills_gap, OnetCodeSource, OnetCodeTarget, active_tab):
     if not OnetCodeSource or not OnetCodeTarget:
-        return None, None
-    return skillsgap_details_tabs(OnetCodeSource, OnetCodeTarget), "tab-0"
+        return skillsgap_details_tabs(), None
+    if active_tab is None: 
+        return skillsgap_details_tabs(), "tab-0"
+    return skillsgap_details_tabs(), active_tab
 
 
 @app.callback(
@@ -298,13 +300,17 @@ def add_skillsgap_details_tab(skills_gap, OnetCodeSource, OnetCodeTarget):
     Input("target_occupation_dropdown", "value")]
 )
 def switch_skillsgap_details_tab(active_tab, skills_gap, OnetCodeSource, OnetCodeTarget):
-
-    if active_tab == "tab-0":
+    #print(skills_gap)
+    if not OnetCodeSource or not OnetCodeTarget or not skills_gap:
+        return  None
+    elif active_tab == "tab-0":
         return salary_graph(skills_gap)
     elif active_tab == "tab-1":
         return similarity_tab_details(skills_gap)
     elif active_tab == "tab-2":
         return differences_tab_details(skills_gap, OnetCodeSource, OnetCodeTarget)
+    elif active_tab == "tab-3":
+        return training_tab_details(skills_gap,  OnetCodeSource, OnetCodeTarget)
 
 
 @app.callback(

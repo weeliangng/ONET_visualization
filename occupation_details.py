@@ -5,6 +5,7 @@ from network_logic import get_occupation_onetsocCode_dict
 import dash_bootstrap_components as dbc
 
 from network_logic import get_occupation_onetsocCode_list
+from skillsgap_details import skillsgap_details_tabs
 
 def get_occupation_description(onetsoc_code):
     conn = sqlite3.connect('./data/ONET.sqlite')
@@ -125,11 +126,20 @@ def default_sidebar():
                                         html.A(href="https://services.onetcenter.org/", children = ["O*NET Web Services"]),
                                         " by the U.S. Department of Labor, Employment and Training Administration (USDOL/ETA). O*NET&reg; is a trademark of USDOL/ETA."
                                     ])
-                                ]
+                                ]),
+                                html.Div(style = {"text-align": "center"},
+                                children=
+                                    html.A(href="http://www.careeronestop.org/", 
+                                            children = html.Img(src="http://www.careeronestop.org/tridionmultimedia/tcm24-26158_CareerOneStopLogo-linktous.gif",
+                                                style={"border": "0"}, alt ="careeronestop logo")
+                                    
+                                    )
+                                
 
                                 )
 
                             ]
+                                
                         ),
                     dbc.Tab(label = "Gap Analysis", className = "mx-3",
                             children =[
@@ -145,9 +155,30 @@ def default_sidebar():
                                                     dcc.Store(id='memory-skills_gap')
                                                     ]
                                         ),
-                                html.Div(id = "gap_analysis_tab")
+                                html.Div(id = "gap_analysis_tab",
+                                            children = [skillsgap_details_tabs(),
+                                                        ]
+                                            )
                                         ]
-                                    )
+                                    ),
+                    dbc.Tab(label = "Developed by", className = "mx-3",
+                            children =[ 
+                                        dcc.Markdown("""
+                                        Developed by Ng Wee Liang  
+                                        Using the following Python Libraries:
+                                        * Dash
+                                        * Plotly
+                                        * Dash_Cytoscape
+                                        * networkx
+                                        """),
+                                        #html.Script(src="https://kit.fontawesome.com/ec26958d6d.js"),
+                                        html.Div(className="LI-profile-badge",
+                                            children = [html.A(className ="LI-simple-link", href= "https://sg.linkedin.com/in/wee-liang-ng?trk=profile-badge", children = html.I(className ="fab fa-linkedin fa-3x")),
+                                            ]
+                                        ),
+
+
+                            ])
     ])
     return tabs
 
