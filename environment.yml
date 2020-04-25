@@ -10,5 +10,7 @@ dependencies:
   - matplotlib
   - bleach
   - dash-bootstrap-components
+  - yaml
+  - requests
 prefix: C:\Users\weeli\Anaconda3\envs\onet_vis
 
