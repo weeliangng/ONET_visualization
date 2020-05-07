@@ -336,4 +336,4 @@ def show_modal(n1, n2, n3, show_instruction_modal_checklist, is_open):
 
 if __name__ == "__main__":
     #main()
-    app.run_server(debug=True)
+    app.run_server(host='0.0.0.0', port=8050, debug=True)
